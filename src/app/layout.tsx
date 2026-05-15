@@ -44,6 +44,25 @@ export default function RootLayout({
           a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
           document.head.appendChild(a);
         `}</Script>
+        <Script id="hide-cartpanda" strategy="afterInteractive">{`
+          function hideCpd(el) {
+            if (!el || !el.className) return;
+            var cls = typeof el.className === 'string' ? el.className : '';
+            if (cls.indexOf('cpd-') !== -1) { el.style.setProperty('display','none','important'); }
+          }
+          document.querySelectorAll('[class*="cpd-"]').forEach(hideCpd);
+          var obs = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+              m.addedNodes.forEach(function(n) {
+                if (n.nodeType === 1) {
+                  hideCpd(n);
+                  n.querySelectorAll && n.querySelectorAll('[class*="cpd-"]').forEach(hideCpd);
+                }
+              });
+            });
+          });
+          obs.observe(document.body, { childList: true, subtree: true });
+        `}</Script>
         {children}
       </body>
     </html>

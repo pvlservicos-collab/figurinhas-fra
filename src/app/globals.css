@@ -49,10 +49,7 @@ body {
 }
 
 /* Oculta elementos do CartPanda */
-.cpd-logo,
-.cpd-button-undefined,
-[class*="cpd-logo"],
-[class*="cpd-button"] {
+[class*="cpd-"] {
   display: none !important;
 }
 

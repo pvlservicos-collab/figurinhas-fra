@@ -23,8 +23,8 @@ export default function Obrigado() {
         >
           <div className="relative w-full h-full">
             <Image
-              src="/figurinha-helena.png"
-              alt="Figurinha Helena"
+              src="/figurinha-camille.png"
+              alt="Figurinha Camille"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 144px, 192px"
@@ -41,8 +41,8 @@ export default function Obrigado() {
         >
           <div className="relative w-full h-full">
             <Image
-              src="/figurinha-miguel.png"
-              alt="Figurinha Miguel"
+              src="/figurinha-antoine.png"
+              alt="Figurinha Antoine"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 176px, 240px"
@@ -60,8 +60,8 @@ export default function Obrigado() {
         >
           <div className="relative w-full h-full">
             <Image
-              src="/figurinha-arthur.png"
-              alt="Figurinha Arthur"
+              src="/figurinha-camille.png"
+              alt="Figurinha Camille"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 144px, 192px"
