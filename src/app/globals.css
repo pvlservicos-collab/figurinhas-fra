@@ -48,6 +48,12 @@ body {
   font-family: 'Papernotes', cursive;
 }
 
+/* Oculta barra do CartPanda */
+.cpd-logo,
+[class*="cpd-logo"] {
+  display: none !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

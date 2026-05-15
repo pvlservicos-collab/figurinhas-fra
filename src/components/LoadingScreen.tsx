@@ -117,9 +117,7 @@ export default function LoadingScreen({ title, gifUrl, longWait, startTime }: Lo
           style={{ fontFamily: "var(--font-papernotes)" }}
         >
           {longWait ? (
-            <>
-              <span className="text-copa-blue font-bold">futur champion en célébration détecté</span>
-            </>
+            <span className="text-copa-blue font-bold">⚽ {curiosidades[curiosidadeIndex]}</span>
           ) : (
             "Hihi… il aime bien"
           )}
