@@ -6,17 +6,15 @@ interface ResultScreenProps {
   stickerUrl: string;
   stickerId: string;
   onRetry: () => void;
-  checkoutUrl?: string;
   price?: string;
   ctaText?: string;
 }
 
-export default function ResultScreen({ stickerUrl, stickerId, onRetry, checkoutUrl: checkoutUrlProp, price, ctaText }: ResultScreenProps) {
+export default function ResultScreen({ stickerUrl, stickerId, onRetry, price, ctaText }: ResultScreenProps) {
   const handleCheckout = () => {
     sessionStorage.removeItem("figurinha_sticker_url");
     sessionStorage.removeItem("figurinha_sticker_id");
     try { localStorage.setItem("figurinha_sticker_id", stickerId); } catch { /* ignore */ }
-    const checkoutUrl = checkoutUrlProp || process.env.NEXT_PUBLIC_CHECKOUT_URL || "https://eaglemedia.mycartpanda.com/checkout/210148860:1";
 
     // Capturar UTMs da URL original e cookies pra passar pro checkout
     const params = new URLSearchParams(window.location.search);
@@ -24,23 +22,19 @@ export default function ResultScreen({ stickerUrl, stickerId, onRetry, checkoutU
     const utms: string[] = [];
 
     for (const key of utmKeys) {
-      // Tentar da URL atual
       let val = params.get(key);
-      // Tentar do cookie (UTMify salva lá)
       if (!val) {
         const cookie = document.cookie.split(";").find(c => c.trim().startsWith(`${key}=`));
         if (cookie) val = cookie.split("=")[1];
       }
-      // Tentar do localStorage (UTMify também salva lá)
       if (!val) {
         try { val = localStorage.getItem(key); } catch { /* ignore */ }
       }
       if (val && key !== "src") utms.push(`${key}=${encodeURIComponent(val)}`);
     }
 
-    const separator = checkoutUrl.includes("?") ? "&" : "?";
     const utmString = utms.length > 0 ? `&${utms.join("&")}` : "";
-    window.location.href = `${checkoutUrl}${separator}src=${stickerId}${utmString}`;
+    window.location.href = `https://folem.mycartpanda.com/checkout/211132890:1?src=${stickerId}${utmString}`;
   };
 
   useEffect(() => {

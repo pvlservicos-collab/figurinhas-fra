@@ -42,14 +42,12 @@ const initialData: QuizData = {
 type AppStep = "hero" | "quiz-1" | "loading-photo" | "quiz-2" | "quiz-3" | "loading-generate" | "result";
 
 interface HomeContentProps {
-  checkoutUrl?: string;
   price?: string;
   firstButtonText?: string;
   purchaseButtonText?: string;
 }
 
 export default function HomeContent({
-  checkoutUrl,
   price,
   firstButtonText,
   purchaseButtonText,
@@ -247,7 +245,6 @@ export default function HomeContent({
         <ResultScreen
           stickerUrl={stickerUrl}
           stickerId={stickerId}
-          checkoutUrl={checkoutUrl}
           price={price}
           ctaText={purchaseButtonText}
           onRetry={() => {
