@@ -124,7 +124,10 @@ function dispatchUnauthorized() { window.dispatchEvent(new Event(UNAUTH_EVENT));
 
 function getToken(): string { return localStorage.getItem("admin_token") || ""; }
 function authHeaders(): Record<string, string> {
-  return { "Authorization": `Bearer ${getToken()}`, "Content-Type": "application/json" };
+  const token = getToken();
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) h["Authorization"] = `Bearer ${token}`;
+  return h;
 }
 
 // ==============================
@@ -206,9 +209,10 @@ function LoginScreen({ onLogin }: { onLogin: (user: string) => void }) {
           Painel Vignette
         </h1>
         <p style={{ color: "#475569", fontSize: 13, margin: "0 0 32px" }}>Copa do Mundo 2026 — França</p>
+        <p style={{ color: "#64748b", fontSize: 12, margin: "0 0 10px" }}>pedro · vini · tel</p>
         <input
           type="text"
-          placeholder=""
+          placeholder="Seu nome..."
           value={value}
           onChange={e => { setValue(e.target.value); setError(false); }}
           onKeyDown={e => e.key === "Enter" && !loading && handleSubmit()}
@@ -1237,7 +1241,8 @@ export default function Painel() {
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
     const savedUser = localStorage.getItem("painel_user");
-    if (token && savedUser) setUser(savedUser);
+    // token sem painel_user: compatibilidade com sessão anterior
+    if (token) setUser(savedUser || "pedro");
     setReady(true);
   }, []);
 
