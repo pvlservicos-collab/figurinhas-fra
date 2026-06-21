@@ -32,12 +32,15 @@ export async function GET() {
     await sql`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS whats_enviado BOOLEAN DEFAULT FALSE`;
     await sql`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS recovery_sent BOOLEAN DEFAULT FALSE`;
     await sql`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS recovery_sent_at TIMESTAMP`;
+    await sql`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS api_key_used INTEGER`;
+    await sql`ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS generation_ms INTEGER`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS pedido_items (
         id SERIAL PRIMARY KEY,
-        order_id INTEGER,
+        order_id TEXT,
         email VARCHAR(255),
+        telefone VARCHAR(30),
         nome VARCHAR(100),
         item_type VARCHAR(30) DEFAULT 'product',
         offer_hash VARCHAR(100),
@@ -49,6 +52,8 @@ export async function GET() {
         UNIQUE(order_id, offer_hash)
       )
     `;
+    await sql`ALTER TABLE pedido_items ADD COLUMN IF NOT EXISTS telefone VARCHAR(30)`.catch(() => {});
+    await sql`ALTER TABLE pedido_items ALTER COLUMN order_id TYPE TEXT USING order_id::TEXT`.catch(() => {});
 
     await sql`
       CREATE TABLE IF NOT EXISTS leads (
@@ -62,7 +67,24 @@ export async function GET() {
       )
     `;
 
-    // Tabela de idempotência pra webhooks
+    await sql`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id SERIAL PRIMARY KEY,
+        session_id VARCHAR(100) UNIQUE NOT NULL,
+        email VARCHAR(255),
+        nome VARCHAR(100),
+        step VARCHAR(50) NOT NULL,
+        cta_clicked BOOLEAN DEFAULT FALSE,
+        obrigado BOOLEAN DEFAULT FALSE,
+        oferta VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+    await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS cta_clicked BOOLEAN DEFAULT FALSE`;
+    await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS obrigado BOOLEAN DEFAULT FALSE`;
+    await sql`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS oferta VARCHAR(20)`;
+
     await sql`
       CREATE TABLE IF NOT EXISTS webhook_processed (
         id SERIAL PRIMARY KEY,
@@ -79,13 +101,15 @@ export async function GET() {
       )
     `;
 
-    // Índices pra performance em escala
     await sql`CREATE INDEX IF NOT EXISTS idx_pedidos_email ON pedidos(email)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_pedidos_sticker_id ON pedidos(sticker_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_pedidos_status ON pedidos(status)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_pedidos_created_at ON pedidos(created_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_pedido_items_email ON pedido_items(email)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_webhook_processed_key ON webhook_processed(idempotency_key)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_email ON sessions(email)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_step ON sessions(step)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_updated ON sessions(updated_at)`;
 
     return NextResponse.json({ ok: true, message: "Tabelas criadas com sucesso" });
   } catch (error) {
