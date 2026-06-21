@@ -101,7 +101,7 @@ export default function LoadingScreen({ title, gifUrl, longWait, startTime }: Lo
 
         {longWait && (
           <p className="text-sm font-bold text-copa-blue text-center -mt-4" style={{ fontFamily: "var(--font-papernotes)" }}>
-            Ne quittez pas cet écran, cela peut prendre jusqu&apos;à 2 minutes.
+            Ne quittez pas cet écran, cela peut prendre jusqu&apos;à 2 minutes, car nous générons votre vignette en haute qualité.
           </p>
         )}
 

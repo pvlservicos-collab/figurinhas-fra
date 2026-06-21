@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Hero from "@/components/Hero";
 import QuizStep from "@/components/QuizStep";
 import type { QuizData } from "@/components/QuizStep";
+import ConfirmScreen from "@/components/ConfirmScreen";
 import LoadingScreen from "@/components/LoadingScreen";
 import ResultScreen from "@/components/ResultScreen";
 import { DEFAULT_CONFIG } from "@/lib/config-defaults";
@@ -39,7 +40,7 @@ const initialData: QuizData = {
   foto: null,
 };
 
-type AppStep = "hero" | "quiz-1" | "loading-photo" | "quiz-2" | "quiz-3" | "loading-generate" | "result";
+type AppStep = "hero" | "quiz-1" | "loading-photo" | "quiz-2" | "quiz-3" | "confirm" | "loading-generate" | "result";
 
 interface HomeContentProps {
   price?: string;
@@ -70,8 +71,17 @@ export default function HomeContent({
     return "";
   });
   const [genStartTime, setGenStartTime] = useState(0);
+  const [fotoPreviewUrl, setFotoPreviewUrl] = useState<string | null>(null);
   const dataRef = useRef(data);
   dataRef.current = data;
+
+  // Atualiza URL de preview sempre que a foto mudar
+  useEffect(() => {
+    if (!data.foto) { setFotoPreviewUrl(null); return; }
+    const url = URL.createObjectURL(data.foto);
+    setFotoPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [data.foto]);
 
   // Salvar UTMs da URL na chegada pra usar no checkout depois
   useEffect(() => {
@@ -184,9 +194,7 @@ export default function HomeContent({
       setQuizStep(3);
       setAppStep("quiz-3");
     } else if (quizStep === 3) {
-      setGenStartTime(Date.now());
-      setAppStep("loading-generate");
-      generateFigurinha();
+      setAppStep("confirm");
     }
   }, [quizStep, generateFigurinha]);
 
@@ -222,6 +230,22 @@ export default function HomeContent({
           onNext={handleQuizNext}
           onBack={handleQuizBack}
           totalSteps={3}
+        />
+      )}
+
+      {appStep === "confirm" && (
+        <ConfirmScreen
+          data={data}
+          fotoPreviewUrl={fotoPreviewUrl}
+          onConfirm={() => {
+            setGenStartTime(Date.now());
+            setAppStep("loading-generate");
+            generateFigurinha();
+          }}
+          onBack={() => {
+            setQuizStep(3);
+            setAppStep("quiz-3");
+          }}
         />
       )}
 

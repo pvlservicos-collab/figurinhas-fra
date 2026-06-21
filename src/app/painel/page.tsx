@@ -122,9 +122,8 @@ const EMPTY_FUNIL: FunilData = {
 const UNAUTH_EVENT = "painel:unauthorized";
 function dispatchUnauthorized() { window.dispatchEvent(new Event(UNAUTH_EVENT)); }
 
-function getToken(): string { return localStorage.getItem("admin_token") || ""; }
 function authHeaders(): Record<string, string> {
-  return { "Authorization": `Bearer ${getToken()}`, "Content-Type": "application/json" };
+  return { "Content-Type": "application/json" };
 }
 
 // ==============================
@@ -152,26 +151,26 @@ function StatusBadge({ status }: { status: string | null }) {
 // LOGIN SCREEN
 // ==============================
 
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
+function LoginScreen({ onLogin }: { onLogin: (user: string) => void }) {
   const [value, setValue]     = useState("");
   const [error, setError]     = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const token = value.trim();
-    if (!token) return;
+    const name = value.trim().toLowerCase();
+    if (!name) return;
     setLoading(true);
     setError(false);
     try {
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ name }),
       });
       const json = await res.json();
       if (json.ok) {
-        localStorage.setItem("admin_token", token);
-        onLogin();
+        localStorage.setItem("painel_user", json.user);
+        onLogin(json.user);
       } else {
         setError(true);
       }
@@ -206,8 +205,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         </h1>
         <p style={{ color: "#475569", fontSize: 13, margin: "0 0 32px" }}>Copa do Mundo 2026 — França</p>
         <input
-          type="password"
-          placeholder="Admin token..."
+          type="text"
+          placeholder=""
           value={value}
           onChange={e => { setValue(e.target.value); setError(false); }}
           onKeyDown={e => e.key === "Enter" && !loading && handleSubmit()}
@@ -222,7 +221,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         />
         {error && (
           <p style={{ color: "#ef4444", fontSize: 12, margin: "0 0 10px", fontWeight: 600 }}>
-            Token inválido. Tente novamente.
+            Nome não reconhecido. Tente novamente.
           </p>
         )}
         <button
@@ -254,8 +253,8 @@ const NAV_ITEMS: { tab: Tab; label: string; icon: string }[] = [
   { tab: "orderbumps",  label: "Order Bumps",  icon: "🛒" },
 ];
 
-function Sidebar({ tab, onTab, onLogout }: {
-  tab: Tab; onTab: (t: Tab) => void; onLogout: () => void;
+function Sidebar({ tab, onTab, user, onLogout }: {
+  tab: Tab; onTab: (t: Tab) => void; user: string; onLogout: () => void;
 }) {
   return (
     <aside style={{
@@ -300,6 +299,19 @@ function Sidebar({ tab, onTab, onLogout }: {
       </nav>
 
       <div style={{ padding: "14px 12px", borderTop: "1px solid #1e293b" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: "50%", background: "#002395", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontWeight: 800, fontSize: 14,
+          }}>
+            {user[0]?.toUpperCase()}
+          </div>
+          <div>
+            <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13, textTransform: "capitalize" }}>{user}</div>
+            <div style={{ color: "#475569", fontSize: 10 }}>Administrador</div>
+          </div>
+        </div>
         <button
           onClick={onLogout}
           style={{
@@ -1210,18 +1222,19 @@ function LeadsTab() {
 // ==============================
 
 export default function Painel() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [tab, setTab]           = useState<Tab>("figurinhas");
-  const [ready, setReady]       = useState(false);
+  const [user, setUser]   = useState<string | null>(null);
+  const [tab, setTab]     = useState<Tab>("figurinhas");
+  const [ready, setReady] = useState(false);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem("admin_token");
-    setLoggedIn(false);
+  const logout = useCallback(async () => {
+    await fetch("/api/admin/auth", { method: "DELETE" }).catch(() => {});
+    localStorage.removeItem("painel_user");
+    setUser(null);
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (token) setLoggedIn(true);
+    const saved = localStorage.getItem("painel_user");
+    if (saved) setUser(saved);
     setReady(true);
   }, []);
 
@@ -1231,7 +1244,7 @@ export default function Painel() {
   }, [logout]);
 
   if (!ready) return null;
-  if (!loggedIn) return <LoginScreen onLogin={() => setLoggedIn(true)} />;
+  if (!user) return <LoginScreen onLogin={(u) => setUser(u)} />;
 
   return (
     <div style={{
@@ -1239,7 +1252,7 @@ export default function Painel() {
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       background: "#f1f5f9", fontSize: 14, color: "#1e293b",
     }}>
-      <Sidebar tab={tab} onTab={setTab} onLogout={logout} />
+      <Sidebar tab={tab} onTab={setTab} user={user} onLogout={logout} />
       <main style={{ flex: 1, overflowY: "auto" }}>
         {tab === "figurinhas"  && <FigurinhasTab />}
         {tab === "metricas"    && <MetricasTab />}
