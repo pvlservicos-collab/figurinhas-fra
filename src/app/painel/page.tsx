@@ -122,8 +122,9 @@ const EMPTY_FUNIL: FunilData = {
 const UNAUTH_EVENT = "painel:unauthorized";
 function dispatchUnauthorized() { window.dispatchEvent(new Event(UNAUTH_EVENT)); }
 
+function getToken(): string { return localStorage.getItem("admin_token") || ""; }
 function authHeaders(): Record<string, string> {
-  return { "Content-Type": "application/json" };
+  return { "Authorization": `Bearer ${getToken()}`, "Content-Type": "application/json" };
 }
 
 // ==============================
@@ -170,6 +171,7 @@ function LoginScreen({ onLogin }: { onLogin: (user: string) => void }) {
       const json = await res.json();
       if (json.ok) {
         localStorage.setItem("painel_user", json.user);
+        if (json.token) localStorage.setItem("admin_token", json.token);
         onLogin(json.user);
       } else {
         setError(true);
@@ -1226,15 +1228,16 @@ export default function Painel() {
   const [tab, setTab]     = useState<Tab>("figurinhas");
   const [ready, setReady] = useState(false);
 
-  const logout = useCallback(async () => {
-    await fetch("/api/admin/auth", { method: "DELETE" }).catch(() => {});
+  const logout = useCallback(() => {
+    localStorage.removeItem("admin_token");
     localStorage.removeItem("painel_user");
     setUser(null);
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("painel_user");
-    if (saved) setUser(saved);
+    const token = localStorage.getItem("admin_token");
+    const savedUser = localStorage.getItem("painel_user");
+    if (token && savedUser) setUser(savedUser);
     setReady(true);
   }, []);
 

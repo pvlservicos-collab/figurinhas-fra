@@ -31,15 +31,7 @@ export async function POST(req: NextRequest) {
   }
 
   const adminToken = process.env.ADMIN_TOKEN || "";
-  const res = NextResponse.json({ ok: true, user: name });
-  res.cookies.set(SESSION_COOKIE, adminToken, {
-    httpOnly: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-    secure: process.env.NODE_ENV === "production",
-  });
-  return res;
+  return NextResponse.json({ ok: true, user: name, token: adminToken });
 }
 
 export async function DELETE() {
