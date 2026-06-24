@@ -11,7 +11,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   locale: "fr-FR",
   currency: "EUR",
   price: "€2,99",
-  checkoutUrl: "https://folem.mycartpanda.com/checkout/211132890:1",
+  checkoutUrl: "https://buy.stripe.com/5kQ3cvcFZ01P4VTb2v5Vu09",
   firstButtonText: "COMMENCER",
   purchaseButtonText: "RECEVOIR MA VIGNETTE",
 };

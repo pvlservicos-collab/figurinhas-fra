@@ -682,8 +682,8 @@ function MetricasTab() {
 
       <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "10px 16px", marginBottom: 16, fontSize: 13, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontWeight: 700, color: "#166534" }}>🔗 Checkout:</span>
-        <a href="https://folem.mycartpanda.com/checkout/211132890:1" target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline", wordBreak: "break-all" }}>
-          https://folem.mycartpanda.com/checkout/211132890:1
+        <a href="https://buy.stripe.com/5kQ3cvcFZ01P4VTb2v5Vu09" target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline", wordBreak: "break-all" }}>
+          https://buy.stripe.com/5kQ3cvcFZ01P4VTb2v5Vu09
         </a>
       </div>
 

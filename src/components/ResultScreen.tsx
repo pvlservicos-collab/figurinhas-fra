@@ -34,7 +34,7 @@ export default function ResultScreen({ stickerUrl, stickerId, onRetry, price, ct
     }
 
     const utmString = utms.length > 0 ? `&${utms.join("&")}` : "";
-    window.location.href = `https://folem.mycartpanda.com/checkout/211132890:1?src=${stickerId}${utmString}`;
+    window.location.href = `https://buy.stripe.com/5kQ3cvcFZ01P4VTb2v5Vu09?src=${stickerId}${utmString}`;
   };
 
   useEffect(() => {

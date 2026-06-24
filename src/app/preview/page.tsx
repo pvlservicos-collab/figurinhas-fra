@@ -82,7 +82,7 @@ function PreviewContent() {
 
         <button
           onClick={() => {
-            const checkoutUrl = "https://folem.mycartpanda.com/checkout/211132890:1";
+            const checkoutUrl = "https://buy.stripe.com/5kQ3cvcFZ01P4VTb2v5Vu09";
             const p = new URLSearchParams(window.location.search);
             const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid", "gclid", "ttclid", "sck"];
             const utms: string[] = [];
